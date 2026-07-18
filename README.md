@@ -1,0 +1,132 @@
+isclaimer: This is not an official Google product.
+
+# Mug (![Coverage](.github/badges/mug-coverage.svg))
+A small Java 8+ string processing and streams library ([javadoc](http://google.github.io/mug/apidocs/index.html)), widely used in Google's internal Java codebase, with **0 deps** (Proto, BigQuery, Guava addons are in separate artifacts). ![](https://travis-ci.org/google/mug.svg?branch=master)
+
+## Strings
+
+- ✅ [`Substring`](https://github.com/google/mug/wiki/Substring-Explained) – simple and composable substring extraction & manipulation  
+  → `Substring.between("(", ")").from("call(foo)") → "foo"`
+- ✅ [`StringFormat`](https://github.com/google/mug/wiki/StringFormat-Explained) – compile-time-safe bidirectional parsing/formatting  
+  → `new StringFormat("/home/{user}/{date}").parse(filePath, (user, date) -> ...)`
+- ✅ [`Parser`](https://google.github.io/mug/apidocs/com/google/common/labs/parse/Parser.html) – everyday string parsing easier, faster and beyond regex  
+    ```java
+    sequence(word().followedBy("="), digits(), Map::entry)
+        .zeroOrMoreDelimitedBy(",")
+        .between("{", "}")         // {k1=100, k2=200, k3=300, ...}
+        .parse(input);
+    ``` 
+- [`DateTimeFormats`](./mug/src/main/java/com/google/mu/time/README.md) – define datetime formats by _examples_  
+  → `DateTimeFormatter format = formatOf("2024-03-14 10.60:00.123 America/New_York")`
+
+## Streams
+- ✅ [`BiStream`](./mug/src/main/java/com/google/mu/util/stream/README.md) – streams `Map` and pair-wise collections  
+  → `BiStream.zip(keys, values).toMap()`
+- ✅ [`MoreStreams`](https://google.github.io/mug/apidocs/com/google/mu/util/stream/MoreStreams.html) – extra stream utilities  
+    ```java
+    Stream<List<Double>> greenDays = MoreStreams.groupConsecutive(
+        stockPrices, (p1, p2) -> p1 <= p2, toUnmodifiableList());
+    ```
+
+## Others
+- ✅ [`@ParametersMustMatchByName`](https://google.github.io/mug/apidocs/com/google/mu/annotations/ParametersMustMatchByName.html)```record Profile(String userId, String userName) {}``` 
+  - `new Profile(user.id(), user.name())`   Compiles ✅
+  - `new Profile(user.name(), user.id())` Does Not Compile ❌
+- ✅ [`SafeSql`](./mug-safesql/src/main/java/com/google/mu/safesql/README.md) – _compile-time-enforced_ **safe**, **composable** SQL template  
+  → ```SafeSql.of("select id, `{col}` from Users where id = {id}", col, id)```
+
+<details>
+<summary>More tools</summary>
+
+- [`Iteration`](./mug/wiki/Iteration-Explained) - implement lazy stream with recursive code
+- [`BinarySearch`](./mug-guava/src/main/java/com/google/guava/labs/collect/README.md) - solve LeetCode binary search problems  
+  → `BinarySearch.inSortedArrayWithTolerance(doubleArray, 0.0001).find(target)`
+- [`StructuredConcurrency`](./mug/src/main/java/com/google/mu/util/concurrent/README.md) - simple structured concurrency on virtual threads  
+  → `concurrently(() -> fetchArm(), () -> fetchLeg(), (arm, leg) -> makeRobot(arm, leg))`
+- [`Optionals`](./mug/apidocs/com/google/mu/util/Optionals.html)  
+  → `return optionally(obj.hasFoo(), obj::getFoo);`
+
+</details>
+
+<details>
+<summary>Installation</summary>
+
+##### Maven
+
+Add the following to pom.xml:
+```
+  <dependency>
+    <groupId>com.google.mug</groupId>
+    <artifactId>mug</artifactId>
+    <version>10.6</version>
+  </dependency>
+```
+
+Add `mug-errorprone` to your annotationProcessorPaths:
+
+```
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <annotationProcessorPaths>
+              <path>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_core</artifactId>
+                <version>2.23.0</version>
+              </path>
+              <path>
+                <groupId>com.google.mug</groupId>
+                <artifactId>mug-errorprone</artifactId>
+                <version>10.6</version>
+              </path>
+            </annotationProcessorPaths>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+```
+SafeSql ([javadoc](https://google.github.io/mug/apidocs/com/google/mu/safesql/package-summary.html)):
+```
+  <dependency>
+    <groupId>com.google.mug</groupId>
+    <artifactId>mug-safesql</artifactId>
+    <version>10.6</version>
+  </dependency>
+```
+
+
+Dot Parse Combinators ([javadoc](https://google.github.io/mug/apidocs/com/google/common/labs/parse/package-summary.html)):
+```
+  <dependency>
+    <groupId>com.google.mug</groupId>
+    <artifactId>dot-parse</artifactId>
+    <version>10.6</version>
+  </dependency>
+```
+
+Protobuf utils ([javadoc](https://google.github.io/mug/apidocs/com/google/mu/protobuf/util/package-summary.html)):
+```
+  <dependency>
+    <groupId>com.google.mug</groupId>
+    <artifactId>mug-protobuf</artifactId>
+    <version>10.6</version>
+  </dependency>
+```
+
+##### Gradle
+
+Add to build.gradle:
+```
+  implementation 'com.google.mug:mug:10.6'
+  implementation 'com.google.mug:mug-safesql:10.6'
+  implementation 'com.google.mug:dot-parse:10.6'
+  implementation 'com.google.mug:mug-guava:10.6'
+  implementation 'com.google.mug:mug-protobuf:10.6'
+```
+</details>
+
+
