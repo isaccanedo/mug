@@ -117,7 +117,7 @@ Protobuf utils ([javadoc](https://google.github.io/mug/apidocs/com/google/mu/pro
   </dependency>
 ```
 
-##### Gradle
+#### Gradle
 
 Add to build.gradle:
 ```
